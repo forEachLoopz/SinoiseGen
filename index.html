@@ -15,6 +15,26 @@
         <canvas id="canvas"></canvas>
         <br><br>
         <button id="download" disabled>Télécharger l'image traitée</button>
+        <br><br>
+        <label for="pixelSize">Taille des pixels:</label>
+        <input type="range" id="pixelSize" min="1" max="100" value="10">
+        <span id="pixelSizeValue">10</span>
+        <br>
+        <label for="noiseIntensity">Intensité du bruit:</label>
+        <input type="range" id="noiseIntensity" min="0" max="100" value="50">
+        <span id="noiseIntensityValue">50</span>
+        <br>
+        <label for="blurRadius">Rayon du flou:</label>
+        <input type="range" id="blurRadius" min="0" max="50" value="10">
+        <span id="blurRadiusValue">10</span>
+        <br>
+        <label for="zoomX">Position du zoom X:</label>
+        <input type="range" id="zoomX" min="0" max="800" value="0">
+        <span id="zoomXValue">0</span>
+        <br>
+        <label for="zoomY">Position du zoom Y:</label>
+        <input type="range" id="zoomY" min="0" max="800" value="0">
+        <span id="zoomYValue">0</span>
     </div>
     <script src="script.js"></script>
 </body>

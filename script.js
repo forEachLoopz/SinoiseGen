@@ -1,7 +1,9 @@
 document.getElementById('upload').addEventListener('change', handleImage, false);
 document.getElementById('download').addEventListener('click', downloadImage, false);
 
-let canvas, ctx;
+// Variables globales pour stocker les données de l'image originale
+let canvas, ctx, img, originalImageData;
+let zoomX = 0, zoomY = 0;
 
 function handleImage(event) {
     canvas = document.getElementById('canvas');
@@ -9,42 +11,55 @@ function handleImage(event) {
     const reader = new FileReader();
     
     reader.onload = function(e) {
-        const img = new Image();
+        img = new Image();
         img.onload = function() {
-            // Set canvas dimensions
-            canvas.width = img.width * 6;  // Zoom x6
-            canvas.height = img.height * 6;
-            
-            // Draw zoomed image
-            ctx.drawImage(img, 0, 0, img.width * 6, img.height * 6);
-            
-            // Crop to 800x800
-            const cropped = ctx.getImageData(0, 0, 800, 800);
+            // Set initial canvas dimensions
             canvas.width = 800;
             canvas.height = 800;
-            ctx.putImageData(cropped, 0, 0);
-
-            // Apply strong blur to the cropped image
-            applyBlur(ctx, 800, 800, 65);
-
-            // Pixelate the image
-            pixelate(ctx, 800, 800, 50);
-
-            // Increase color contrast
-            increaseContrast(ctx, 800, 800, 1.5);
-
-            // Add larger colored noise
-            addColoredNoise(ctx, 800, 800);
-
-            // Apply blur to the noise
-            applyBlur(ctx, 800, 800, 30); // Adjust blur radius as needed
-
-            // Enable download button
-            document.getElementById('download').disabled = false;
+            
+            // Initialize slider values
+            document.getElementById('pixelSize').value = 10;
+            document.getElementById('noiseIntensity').value = 50;
+            document.getElementById('blurRadius').value = 10;
+            document.getElementById('zoomX').value = 0;
+            document.getElementById('zoomY').value = 0;
+            
+            // Draw the initial zoomed image
+            drawImage();
         };
         img.src = e.target.result;
     };
     reader.readAsDataURL(event.target.files[0]);
+}
+
+function drawImage() {
+    if (!img) return;
+
+    const pixelSize = parseInt(document.getElementById('pixelSize').value);
+    const noiseIntensity = parseInt(document.getElementById('noiseIntensity').value);
+    const blurRadius = parseInt(document.getElementById('blurRadius').value);
+    zoomX = parseInt(document.getElementById('zoomX').value);
+    zoomY = parseInt(document.getElementById('zoomY').value);
+
+    // Clear the canvas before redrawing
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw zoomed image with new zoom position
+    ctx.drawImage(img, -zoomX * 6, -zoomY * 6, img.width * 6, img.height * 6);
+
+    // Crop to 800x800
+    originalImageData = ctx.getImageData(0, 0, 800, 800);
+    ctx.putImageData(originalImageData, 0, 0);
+
+    // Apply effects
+    pixelate(ctx, 800, 800, pixelSize);
+    applyBlur(ctx, 800, 800, blurRadius);
+    addColoredNoise(ctx, 800, 800, noiseIntensity);
+    applyBlur(ctx, 800, 800, blurRadius); // Apply blur to noise
+}
+
+function applyEffects() {
+    drawImage(); // Redraw the image with updated effects
 }
 
 function downloadImage() {
@@ -57,7 +72,7 @@ function downloadImage() {
 function pixelate(ctx, width, height, pixelSize) {
     const imageData = ctx.getImageData(0, 0, width, height);
     const pixels = imageData.data;
-    
+
     for (let y = 0; y < height; y += pixelSize) {
         for (let x = 0; x < width; x += pixelSize) {
             const red = pixels[((width * y) + x) * 4];
@@ -78,14 +93,14 @@ function pixelate(ctx, width, height, pixelSize) {
     ctx.putImageData(imageData, 0, 0);
 }
 
-function addColoredNoise(ctx, width, height) {
+function addColoredNoise(ctx, width, height, intensity) {
     const imageData = ctx.getImageData(0, 0, width, height);
     const pixels = imageData.data;
     
     for (let i = 0; i < pixels.length; i += 4) {
-        const noiseRed = Math.random() * 100 - 50; // Noise range for red: [-50, 50]
-        const noiseGreen = Math.random() * 100 - 50; // Noise range for green: [-50, 50]
-        const noiseBlue = Math.random() * 100 - 50; // Noise range for blue: [-50, 50]
+        const noiseRed = Math.random() * intensity - (intensity / 2);
+        const noiseGreen = Math.random() * intensity - (intensity / 2);
+        const noiseBlue = Math.random() * intensity - (intensity / 2);
 
         pixels[i] = clamp(pixels[i] + noiseRed);      // Red channel
         pixels[i + 1] = clamp(pixels[i + 1] + noiseGreen); // Green channel
@@ -109,6 +124,7 @@ function applyBlur(ctx, width, height, blurRadius) {
     tempCtx.drawImage(ctx.canvas, 0, 0, width, height);
 
     // Apply the blur effect
+    ctx.clearRect(0, 0, width, height); // Clear the canvas before applying blur
     ctx.globalAlpha = 0.5; // Adjust transparency for blur effect
     for (let y = -blurRadius; y <= blurRadius; y += 2) {
         for (let x = -blurRadius; x <= blurRadius; x += 2) {
@@ -121,19 +137,28 @@ function applyBlur(ctx, width, height, blurRadius) {
     ctx.globalAlpha = 1.0; // Reset transparency
 }
 
-function increaseContrast(ctx, width, height, factor) {
-    const imageData = ctx.getImageData(0, 0, width, height);
-    const pixels = imageData.data;
+// Event listeners for sliders
+document.getElementById('pixelSize').addEventListener('input', function() {
+    document.getElementById('pixelSizeValue').textContent = this.value;
+    applyEffects();
+});
 
-    const adjust = value => {
-        return clamp(((value - 128) * factor) + 128);
-    }
+document.getElementById('noiseIntensity').addEventListener('input', function() {
+    document.getElementById('noiseIntensityValue').textContent = this.value;
+    applyEffects();
+});
 
-    for (let i = 0; i < pixels.length; i += 4) {
-        pixels[i] = adjust(pixels[i]);     // Red
-        pixels[i + 1] = adjust(pixels[i + 1]); // Green
-        pixels[i + 2] = adjust(pixels[i + 2]); // Blue
-    }
+document.getElementById('blurRadius').addEventListener('input', function() {
+    document.getElementById('blurRadiusValue').textContent = this.value;
+    applyEffects();
+});
 
-    ctx.putImageData(imageData, 0, 0);
-}
+document.getElementById('zoomX').addEventListener('input', function() {
+    document.getElementById('zoomXValue').textContent = this.value;
+    applyEffects();
+});
+
+document.getElementById('zoomY').addEventListener('input', function() {
+    document.getElementById('zoomYValue').textContent = this.value;
+    applyEffects();
+});
