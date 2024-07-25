@@ -9,33 +9,43 @@
 <body>
     <h1>Sinoise Gen</h1>
     <div class="container">
-        <label for="upload" class="uploadBtn">Télécharger une image</label>
+        <label for="upload">Télécharger une image</label>
         <input type="file" id="upload" accept="image/*">
-        
-        <label for="pixelSize">Taille des pixels:</label>
-        <input type="range" id="pixelSize" min="1" max="100" value="10">
-        <span id="pixelSizeValue">10</span>
-        
-        <label for="noiseIntensity">Intensité du bruit:</label>
-        <input type="range" id="noiseIntensity" min="1" max="100" value="50">
-        <span id="noiseIntensityValue">50</span>
-        
-        <label for="blurRadius">Rayon du flou:</label>
-        <input type="range" id="blurRadius" min="1" max="100" value="10">
-        <span id="blurRadiusValue">10</span>
-        
-        <label for="zoomX">Position X:</label>
-        <input type="range" id="zoomX" min="0" max="100" value="0">
-        <span id="zoomXValue">0</span>
-        
-        <label for="zoomY">Position Y:</label>
-        <input type="range" id="zoomY" min="0" max="100" value="0">
-        <span id="zoomYValue">0</span>
-        
         <br><br>
         <canvas id="canvas"></canvas>
         <br><br>
         <button id="download" disabled>Télécharger l'image traitée</button>
+        <div class="controls">
+            <div class="control-group">
+                <label for="pixelSize">Taille des pixels : <span id="pixelSizeValue">10</span></label>
+                <input type="range" id="pixelSize" min="1" max="50" value="10">
+            </div>
+            <div class="control-group">
+                <label for="noiseIntensity">Intensité du bruit : <span id="noiseIntensityValue">50</span></label>
+                <input type="range" id="noiseIntensity" min="1" max="100" value="50">
+            </div>
+            <div class="control-group">
+                <label for="blurRadius">Rayon du flou : <span id="blurRadiusValue">10</span></label>
+                <input type="range" id="blurRadius" min="0" max="50" value="10">
+            </div>
+            <div class="control-group">
+                <label for="zoomX">Position du zoom (X) : <span id="zoomXValue">0</span></label>
+                <input type="range" id="zoomX" min="0" max="100" value="0">
+            </div>
+            <div class="control-group">
+                <label for="zoomY">Position du zoom (Y) : <span id="zoomYValue">0</span></label>
+                <input type="range" id="zoomY" min="0" max="100" value="0">
+            </div>
+            <div class="control-group">
+                <label for="zoomIntensity">Intensité du zoom : <span id="zoomIntensityValue">6</span></label>
+                <input type="range" id="zoomIntensity" min="1" max="10" value="6">
+            </div>
+            <div class="randomize">
+                <button id="randomize">Randomizer</button>
+            </div>
+        </div>
+        <h3>C'est quoi le Sinoise ?</h3>
+        <p>Le Sinoise est une technique de traitement d'image découverte par accident, qui transforme les défauts de couleurs d'une image en motifs artistiques uniques. Ce procédé implique un zoom extrême sur une image, suivi d'un découpage, d'une pixelisation et de l'ajout de bruit coloré, souvent intensifié par un effet de flou. Le résultat est une œuvre d'art numérique abstraite où les imperfections initiales de l'image sont mises en avant de manière spectaculaire.</p>
     </div>
     <script src="script.js"></script>
 </body>
