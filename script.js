@@ -4,6 +4,11 @@ document.getElementById('download').addEventListener('click', downloadImage, fal
 // Variables globales pour stocker les données de l'image originale
 let canvas, ctx, img, originalImageData;
 let zoomX = 0, zoomY = 0;
+const dateTime = Date.now();
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    console.log(dateTime);
+});
 
 function handleImage(event) {
     canvas = document.getElementById('canvas');
@@ -56,6 +61,9 @@ function drawImage() {
     applyBlur(ctx, 800, 800, blurRadius);
     addColoredNoise(ctx, 800, 800, noiseIntensity);
     applyBlur(ctx, 800, 800, blurRadius); // Apply blur to noise
+
+    // Enable the download button after image is drawn and processed
+    document.getElementById('download').disabled = false;
 }
 
 function applyEffects() {
@@ -64,7 +72,7 @@ function applyEffects() {
 
 function downloadImage() {
     const link = document.createElement('a');
-    link.download = 'image_traitée.png';
+    link.download = 'image_traitée' + "_" + dateTime + '.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
 }
